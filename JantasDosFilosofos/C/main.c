@@ -183,11 +183,10 @@ void devolverGarfoEsquerda(int numfilosofo)
 void devolverGarfoDireita(int numfilosofo) 
 { 
   	if (Estado[numfilosofo] == Comendo) {
-	    Estado[numfilosofo] = Pensando; 
-	    printf("Filosofo #%d devolveu o garfo #%d.\n", numfilosofo+1, Direita+1); 
-	    forks[Direita] = false;
-	    philo[numfilosofo].right = false;
-	  	philo[numfilosofo].put_right = true;
-		  pensar(numfilosofo);
+		printf("Filosofo #%d devolveu o garfo #%d.\n", numfilosofo+1, Direita+1); 
+		forks[Direita] = false;
+		philo[numfilosofo].right = false;
+		philo[numfilosofo].put_right = true;
+		pensar(numfilosofo);
 	}
 } 
