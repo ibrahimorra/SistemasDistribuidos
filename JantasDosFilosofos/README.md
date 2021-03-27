@@ -29,4 +29,4 @@ __Demonstração da conexão dos vetores Filósofos e Garfos__:
 ![image](https://github.com/ibrahimorra/SistemasDistribuidos/blob/main/JantasDosFilosofos/imgs/imagem2.png)
 
 __Exemplo de DeadLock no terminal__:
-![image](https://github.com/ibrahimorra/SistemasDistribuidos/blob/main/JantasDosFilosofos/imgs/imagem1.png)
+![image](https://github.com/ibrahimorra/SistemasDistribuidos/blob/main/JantasDosFilosofos/imgs/imagem.png)
