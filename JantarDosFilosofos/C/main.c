@@ -1,36 +1,55 @@
 #include <pthread.h> 
 #include <semaphore.h> 
 #include <stdio.h> 
+#include <stdbool.h>
   
-#define Filosofos 5 
+#define Filosofos 15 
 #define Pensando 2 
 #define Fome 1 
 #define Comendo 0 
-#define Esquerda (numfilosofo + 4) % Filosofos 
-#define Direita (numfilosofo + 1) % Filosofos 
-
+#define Esquerda (numfilosofo + 4) % Filosofos
+#define Direita (numfilosofo + 1) % Filosofos
 
 pthread_cond_t condicao[Filosofos];
 
+bool forks[Filosofos];
+
 int Estado[Filosofos]; 
 int Filosofo[Filosofos]; 
-  
-sem_t mutex; 
-sem_t S[Filosofos]; 
+
+struct element {
+    bool left;
+    bool right;
+    bool put_left;
+    bool put_right;
+};
+
+struct element philo[Filosofos];
 
 void *threadFilosofo(void *arg);
-void testar(int);
-void pegarGarfo(int);  
-void devolverGarfo(int);  
-  
+void testarEsquerda(int);
+void testarDireita(int);
+void pegarGarfoEsquerda(int);  
+void pegarGarfoDireita(int);  
+void devolverGarfoEsquerda(int);
+void devolverGarfoDireita(int);  
+void tentarComer(int);
+void pensar(int);
+
 int main() 
 { 
   
     int i; 
     pthread_t ph_thread[Filosofos]; 
-  
-    sem_init(&mutex, 0, 1); 
-  
+    
+    for (i = 0; i < Filosofos; i++){
+    	philo[i].left = false;
+    	philo[i].right = false;
+	}
+	
+  	for (i = 0; i < Filosofos; i++)
+  		forks[i] = false;
+  	
     for (i = 0; i < Filosofos; i++)
         sem_init(&S[i], 0, 0); 
         
@@ -52,6 +71,7 @@ int main()
 	
 	for (i = 0; i < Filosofos; i++)
 		pthread_cond_destroy(&condicao[i]);
+		
 	
 	return(0);
 } 
@@ -59,61 +79,135 @@ int main()
 void *threadFilosofo(void *arg)
 { 
   int *filosofo = arg;
-    while (1) { 
-        sleep(1); 
-        pegarGarfo(*filosofo); 
-        sleep(1); 
-        devolverGarfo(*filosofo); 
-    } 
+    while (1) {   
+		//tempo pensando (sleep)
+		sleep(1);
+		//loop tenta pegar garfo Direita
+		pegarGarfoEsquerda(*filosofo);
+		//loop tenta pegar garfo esquerda
+		pegarGarfoDireita(*filosofo); 
+		//devolve garfo esquerdo
+		devolverGarfoEsquerda(*filosofo);
+		//devolve garfo direito
+		devolverGarfoDireita(*filosofo);
+			
+	    //DeadLock Test
+	    if (
+			Estado[0] == Fome
+		&&	Estado[1] == Fome
+		&&	Estado[2] == Fome
+		&& 	Estado[3] == Fome
+		&&	Estado[4] == Fome
+		&&	(philo[0].left == true || philo[0].right == true)
+		&&	(philo[1].left == true || philo[1].right == true)
+		&&	(philo[2].left == true || philo[2].right == true)
+		&&	(philo[3].left == true || philo[3].right == true)
+		&&	(philo[4].left == true || philo[4].right == true)
+		){
+			printf("|>->-> Deadlock <-<-<|\n");
+			return(0);
+		}
+	    } 
 } 
 
-void testar(int numfilosofo) 
+void tentarComer(int numfilosofo){
+	if (
+		philo[numfilosofo].left == true
+		&&philo[numfilosofo].right == true
+	){
+		printf("Filosofo #%d esta comendo.\n", numfilosofo+1);
+		sleep(1);
+		Estado [numfilosofo] = Comendo;
+	}else{
+		//printf("Filosofo #%d Left Fork -> %s \n", numfilosofo+1, philo[numfilosofo].left ? "true" : "false");
+		//printf("Filosofo #%d Right Fork -> %s \n", numfilosofo+1, philo[numfilosofo].right ? "true" : "false");
+	}
+}
+
+void pensar(int numfilosofo){
+	if (
+		philo[numfilosofo].put_left == true
+		&&philo[numfilosofo].put_right == true
+	){
+		printf("Filosofo #%d esta pensando.\n", numfilosofo+1);
+		sleep(1);
+		Estado [numfilosofo] = Pensando;
+		philo[numfilosofo].put_left = false;
+		philo[numfilosofo].put_right = false;
+	}else{
+		//printf("Filosofo #%d Left Put -> %s \n", numfilosofo+1, philo[numfilosofo].put_left ? "true" : "false");
+		//printf("Filosofo #%d Right Put -> %s \n", numfilosofo+1, philo[numfilosofo].put_right ? "true" : "false");
+	}
+}
+
+void testarEsquerda(int numfilosofo) 
+{ 
+
+	// PH 1 GR 5 / GR 2
+    if (Estado[numfilosofo] == Fome 
+        && Estado[Esquerda-1] != Comendo
+		&& philo[Esquerda-1].right == false )
+		{ 
+	        forks[Esquerda] = true;
+	        philo[numfilosofo].left = true;
+	        printf("Filosofo #%d pega o Garfo #%d.\n",numfilosofo+1, Esquerda+1 );
+	        tentarComer(numfilosofo);
+    	} 
+}
+
+void testarDireita(int numfilosofo) 
 { 
     if (Estado[numfilosofo] == Fome 
-        && Estado[Esquerda] != Comendo 
-        && Estado[Direita] != Comendo)
-		{ 
-	        Estado[numfilosofo] = Comendo; 
-	        sleep(2); 
-	        printf("Filosofo #%d pega o Garfo #%d e #%d.\n", numfilosofo + 1, Esquerda + 1, numfilosofo + 1); 
-	        printf("Filosofo #%d esta Comendo.\n", numfilosofo + 1); 
-	  
-	        sem_post(&S[numfilosofo]); 
+        && Estado[Direita+1] != Comendo
+		&& philo[Direita+1].left == false)
+		{
+				        
+	        forks[Direita] = true;
+	        philo[numfilosofo].right = true;
+	        printf("Filosofo #%d pega o Garfo #%d.\n",numfilosofo+1, Direita+1); 
+	        tentarComer(numfilosofo);
     	} 
-} 
+}
 
-void pegarGarfo(int numfilosofo) 
+void pegarGarfoEsquerda(int numfilosofo) 
 { 
-  
-    sem_wait(&mutex); 
     Estado[numfilosofo] = Fome; 
-  
-    printf("Filosofo #%d esta com Fome\n", numfilosofo + 1); 
-  
-    // Comer se os proximos nao estiverem comendo
-    testar(numfilosofo); 
-  
-    sem_post(&mutex); 
-  
-    // Se nao puder comer esperar a sua vez
-    sem_wait(&S[numfilosofo]); 
-  
-    sleep(1); 
+    printf("Filosofo #%d esta com Fome\n", numfilosofo+1);
+    testarEsquerda(numfilosofo); 
+} 
+
+void pegarGarfoDireita(int numfilosofo) 
+{ 
+    Estado[numfilosofo] = Fome; 
+    printf("Filosofo #%d esta com Fome\n", numfilosofo+1); 
+    testarDireita(numfilosofo); 
 } 
 
 
-void devolverGarfo(int numfilosofo) 
+
+void devolverGarfoEsquerda(int numfilosofo) 
 { 
-  
-    sem_wait(&mutex); 
-   
-    Estado[numfilosofo] = Pensando; 
-  
-    printf("Filosofo #%d devolveu o garfo #%d e #%d.\n", numfilosofo + 1, Esquerda + 1, numfilosofo + 1); 
-    printf("Filosofo #%d esta pensando\n", numfilosofo + 1); 
-  
-    testar(Esquerda); 
-    testar(Direita); 
-  
-    sem_post(&mutex); 
+	if (Estado[numfilosofo] == Comendo) {
+		printf("Filosofo #%d devolveu o garfo #%d.\n", numfilosofo+1, Esquerda+1); 
+		forks[Esquerda] = false;
+		philo[numfilosofo].left = false;
+		philo[numfilosofo].put_left = true;
+		pensar(numfilosofo);
+		testarEsquerda(Esquerda);  
+	}  
+} 
+
+void devolverGarfoDireita(int numfilosofo) 
+{ 
+  	if (Estado[numfilosofo] == Comendo) {
+	    Estado[numfilosofo] = Pensando; 
+	    printf("Filosofo #%d devolveu o garfo #%d.\n", numfilosofo+1, Direita+1); 
+	    forks[Direita] = false;
+	    philo[numfilosofo].right = false;
+		philo[numfilosofo].put_right = true;
+		pensar(numfilosofo);
+	    testarDireita(Direita); 
+	  
+ 
+	}
 } 
