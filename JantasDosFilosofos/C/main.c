@@ -77,13 +77,13 @@ void *threadFilosofo(void *arg)
     while (1) {   
 		//tempo pensando (sleep)
 		sleep(1);
-		//loop tenta pegar garfo Direita
+		//Tenta pegar garfo Esquerda
 		pegarGarfoEsquerda(*filosofo);
-		//loop tenta pegar garfo esquerda
+		//Tenta pegar garfo Direita
 		pegarGarfoDireita(*filosofo); 
-		//devolve garfo esquerdo
+		//Devolve garfo Esquerda
 		devolverGarfoEsquerda(*filosofo);
-		//devolve garfo direito
+		//Devolve garfo Direita
 		devolverGarfoDireita(*filosofo);
 			
 	    //DeadLock Test
