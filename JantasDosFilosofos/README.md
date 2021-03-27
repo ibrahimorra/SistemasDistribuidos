@@ -4,7 +4,7 @@
 
 __Para que o problema do jantar dos filósofos seja solucionado como solicitado foram desenvolvidas novas funções como__:
 
-- pegarGarfoEsquerda (int filosofo):
+- __pegarGarfoEsquerda (int filosofo)__:
 Nessa função o filosofo vai entrar no estado de Fome e chamar a função testarEsquerda(int filosofo).
 Se o filosofo entrar na condição com fome e o filosofo na posição Esquerda-1 não estiver com o garfo direito, então o filosofo pegará o garfo em sua esquerda.
 
