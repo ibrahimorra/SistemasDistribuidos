@@ -23,3 +23,9 @@ Se o filosofo já comeu, então, ele devolverá o garfo direito.
 
 - __pensar (int filosofo)__:
 Se o filosofo já comeu e devolveu o seu garfo direito e garfo esquerda então o filósofo passará a estar no Estado Pensando. Nessa mesma função temos uma chamada de sleep(int) para controlar o tempo que o filosofo leva para pensar.
+
+# Imagens
+__Demonstração da conexão dos vetores Filósofos e Garfos__:
+![image](https://github.com/ibrahimorra/SistemasDistribuidos/blob/main/JantasDosFilosofos/imgs/imagem.png)
+__Exemplo de DeadLock no terminal__:
+![image](https://github.com/ibrahimorra/SistemasDistribuidos/blob/main/JantasDosFilosofos/imgs/imagem2.png)
