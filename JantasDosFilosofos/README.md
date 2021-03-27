@@ -26,7 +26,7 @@ Se o filosofo já comeu e devolveu o seu garfo direito e garfo esquerda então o
 
 # Imagens
 __Demonstração da conexão dos vetores Filósofos e Garfos__:
-![image](https://github.com/ibrahimorra/SistemasDistribuidos/blob/main/JantasDosFilosofos/imgs/imagem.png)
+![image](https://github.com/ibrahimorra/SistemasDistribuidos/blob/main/JantasDosFilosofos/imgs/imagem2.png)
 
 __Exemplo de DeadLock no terminal__:
-![image](https://github.com/ibrahimorra/SistemasDistribuidos/blob/main/JantasDosFilosofos/imgs/imagem2.png)
+![image](https://github.com/ibrahimorra/SistemasDistribuidos/blob/main/JantasDosFilosofos/imgs/imagem1.png)
